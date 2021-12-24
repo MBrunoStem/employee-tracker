@@ -41,9 +41,12 @@ function init() {
                 case 'Update An Employee Role':
                     updateRole()
                     break;
+                default:
+                    renderDB();
             }
         })
     }
+    startApp()
 }
 
 init();
