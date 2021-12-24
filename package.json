@@ -1,0 +1,24 @@
+{
+  "name": "employee-tracker",
+  "version": "1.0.0",
+  "description": "Employee tracker application",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MBrunoStem/employee-tracker.git"
+  },
+  "author": "Mario Bruno",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MBrunoStem/employee-tracker/issues"
+  },
+  "homepage": "https://github.com/MBrunoStem/employee-tracker#readme",
+  "dependencies": {
+    "inquirer": "^8.2.0",
+    "mysql2": "^2.3.3"
+  }
+}
