@@ -1,7 +1,54 @@
 const inquirer = require('inquirer');
+// const connection = require("./db/connection");
 const mysql = require('mysql2');
 const table = require('console.table');
-const db = require('./db');
+// const Database = require('./Database');
+
+const connection = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "testing12345",
+    database: "company_db",
+});
+connection.connect((err) => {
+    if (err)throw err;
+});
+
+class Database {
+    constructor(connection) {
+        this.connection = connection;
+    }
+    viewAllDepartments() {
+        return this.connection.promise().query(
+            'SELECT department.id FROM department'
+        )
+    }
+    viewAllRoles() {
+        return this.connection.promise().query(
+            'SELECT roles.id, role.salary, role.roles_title, department.name AS department FROM roles LEFT JOIN department on roles.department_id=department.id'
+        )
+    }
+    viewAllEmployees() {
+        return this.connection.promise().query(
+            'SELECT employee.id, employee.first_name, employee.last_name, roles.name AS roles FROM employee LEFT JOIN roles on employee.roles_id=roles.id'
+        )
+    }
+createDepartment(department) {
+     return this.connection.promise().query(`INSERT INTO department SET ?`, department)
+};
+
+createRole(role) {
+    return this.connection.promise().query(`INSERT INTO role SET ?` , role);
+};
+
+createEmployee(employee) {
+    return this.connection.promise().query(`INSERT INTO employee SET ?`, employee);
+};
+
+updateRoles() {
+    return this.connection.promise().query(`UPDATE roles SET role = ? WHERE id = ?`);
+};
+}
 
 function init() {
     function startApp() {
@@ -51,13 +98,17 @@ function init() {
             inquirer.prompt([
                 {
                     type: 'input',
+                    name: 'depID',
+                    message: 'Please enter Department ID:'
+                },
+                {
+                    type: 'input',
                     name: 'deptName',
                     message: 'Please enter Department name:'
                 },
             ]).then(answers => {
-                let deptName = answers
-                db.createDepartment(deptName).then( ()=> {
-                    console.log(`Added new department name:${deptName.deptName}`)
+                Database.createDepartment(answers).then( ()=> {
+                    console.log(`Added new department name:${answers.deptName}`)
                 }).then( ()=> {
                     startApp()
                 })
@@ -67,13 +118,13 @@ function init() {
             inquirer.prompt([
                 {
                     type: 'input',
-                    name: 'name',
-                    message: 'Please enter Role name:'
+                    name: 'id',
+                    message: 'Please enter Role ID:'
                 },
                 {
                     type: 'input',
-                    name: 'id',
-                    message: 'Please enter Role ID:'
+                    name: 'name',
+                    message: 'Please enter Role name:'
                 },
                 {
                     type: 'input',
@@ -81,7 +132,7 @@ function init() {
                     message: 'Please enter salary:'
                 },
             ]).then(role => {
-                db.createRole(role).then( ()=> {
+                Database.createRole(role).then( ()=> {
                     console.log(`Added new role named:${role.name}`)
                 }).then( ()=> {
                     startApp()
@@ -106,7 +157,7 @@ function init() {
                     message: 'Please enter Employee ID:'
                 },
             ]).then(employee => {
-                db.createEmployee(employee).then( ()=> {
+                Database.createEmployee(employee).then( ()=> {
                     console.log(`Added new employee named:${employee.name}`)
                 }).then( ()=> {
                     startApp()
