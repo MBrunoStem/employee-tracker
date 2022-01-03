@@ -3,18 +3,6 @@ const mysql = require('mysql2');
 const table = require('console.table');
 const db = require('./db');
 
-// Connect to database
-// const db = mysql.createConnection(
-//     {
-//       host: 'localhost',
-//       user: 'root',
-//       password: 'xairmo',
-//       database: 'movies_db'
-//     },
-//     console.log(`Connected to the movies_db database.`)
-//   );
-
-// Prompt input using Inquirer  
 function init() {
     function startApp() {
         inquirer.prompt([
@@ -35,13 +23,13 @@ function init() {
         ]).then((choice) => {
             switch (choice.choice) {
                 case 'View All Departments':
-                    viewDept()
+                    viewAllDepartments()
                     break;
                 case 'View All Roles':
-                    viewRoles()
+                    viewAllRoles()
                     break;
                 case 'View All Employees':
-                    viewEmployees()
+                    viewAllEmployees()
                     break;
                 case 'Add A Department':
                     addDept()
