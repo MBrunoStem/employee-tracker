@@ -1,54 +1,6 @@
 const inquirer = require('inquirer');
-// const connection = require("./db/connection");
-const mysql = require('mysql2');
+const database = require('./db')
 const table = require('console.table');
-// const Database = require('./Database');
-
-const connection = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "testing12345",
-    database: "company_db",
-});
-connection.connect((err) => {
-    if (err)throw err;
-});
-
-class Database {
-    constructor(connection) {
-        this.connection = connection;
-    }
-    viewAllDepartments() {
-        return this.connection.promise().query(
-            'SELECT department.id FROM department'
-        )
-    }
-    viewAllRoles() {
-        return this.connection.promise().query(
-            'SELECT roles.id, role.salary, role.roles_title, department.name AS department FROM roles LEFT JOIN department on roles.department_id=department.id'
-        )
-    }
-    viewAllEmployees() {
-        return this.connection.promise().query(
-            'SELECT employee.id, employee.first_name, employee.last_name, roles.name AS roles FROM employee LEFT JOIN roles on employee.roles_id=roles.id'
-        )
-    }
-createDepartment(department) {
-     return this.connection.promise().query(`INSERT INTO department SET ?`, department)
-};
-
-createRole(role) {
-    return this.connection.promise().query(`INSERT INTO role SET ?` , role);
-};
-
-createEmployee(employee) {
-    return this.connection.promise().query(`INSERT INTO employee SET ?`, employee);
-};
-
-updateRoles() {
-    return this.connection.promise().query(`UPDATE roles SET role = ? WHERE id = ?`);
-};
-}
 
 function init() {
     function startApp() {
@@ -64,19 +16,43 @@ function init() {
                     'Add A Department',
                     'Add A Role',
                     'Add An Employee',
-                    'Update An Employee Role'
+                    // 'Update An Employee Role',
+                    'EXIT'
                 ]
             }
         ]).then((choice) => {
+            console.log({ choice })
             switch (choice.choice) {
                 case 'View All Departments':
-                    viewAllDepartments()
+                    database.viewAllDepartments()
+                    .then(([response]) => {
+                        console.log('\n')
+                        for (let i = 0; i < response.length; i++) {
+                            console.table(response[i].dept_name)
+                        }
+                        startApp();
+                    })
                     break;
                 case 'View All Roles':
-                    viewAllRoles()
+                    database.viewAllRoles()
+                    .then(([response]) => {
+                        console.log(response)
+                        console.log('\n')
+                        for (let i = 0; i < response.length; i++) {
+                            console.log(`${response[i].role_title} | ${response[i].id} | ${response[i].salary} | ${response[i].department} |`)
+                        }
+                        startApp();
+                    })
                     break;
                 case 'View All Employees':
-                    viewAllEmployees()
+                    database.viewAllEmployees()
+                    .then(([response]) => {
+                        console.log('\n')
+                        for (let i = 0; i < response.length; i++) {
+                        console.log(`${response[i].last_name}, ${response[i].first_name} | ${response[i].role_title } | ${response[i].salary} | ${response[i].manager} ` )
+                        }
+                        startApp()
+                    })
                     break;
                 case 'Add A Department':
                     addDept()
@@ -87,29 +63,31 @@ function init() {
                 case 'Add An Employee':
                     addEmployee()
                     break;
-                case 'Update An Employee Role':
-                    updateRole()
-                    break;
+                // case 'Update An Employee Role':
+                //     updateEmployeeRole()
+                //     break;
+                case 'EXIT':
+                    process.exit();
                 default:
-                    return process.exit();
+                    break;
             }
         })
         function addDept() {
             inquirer.prompt([
                 {
                     type: 'input',
-                    name: 'depID',
+                    name: 'id',
                     message: 'Please enter Department ID:'
                 },
                 {
                     type: 'input',
-                    name: 'deptName',
+                    name: 'dept_name',
                     message: 'Please enter Department name:'
                 },
             ]).then(answers => {
-                Database.createDepartment(answers).then( ()=> {
-                    console.log(`Added new department name:${answers.deptName}`)
-                }).then( ()=> {
+                database.createDepartment(answers).then(() => {
+                    console.log(`Added new department name:${answers.dept_name}`)
+                }).then(() => {
                     startApp()
                 })
             })
@@ -123,7 +101,7 @@ function init() {
                 },
                 {
                     type: 'input',
-                    name: 'name',
+                    name: 'role_title',
                     message: 'Please enter Role name:'
                 },
                 {
@@ -131,10 +109,15 @@ function init() {
                     name: 'salary',
                     message: 'Please enter salary:'
                 },
-            ]).then(role => {
-                Database.createRole(role).then( ()=> {
-                    console.log(`Added new role named:${role.name}`)
-                }).then( ()=> {
+                {
+                    type: 'input',
+                    name: 'department_id',
+                    message: 'Please enter corresponding Department ID:'
+                },
+            ]).then(answers => {
+                database.createRole(answers).then(() => {
+                    console.log(`Added new role named:${answers.role_title}`)
+                }).then(() => {
                     startApp()
                 })
             })
@@ -143,25 +126,42 @@ function init() {
             inquirer.prompt([
                 {
                     type: 'input',
-                    name: 'firstName',
+                    name: 'id',
+                    message: 'Please enter Employee ID:'
+                },
+                {
+                    type: 'input',
+                    name: 'first_name',
                     message: 'Please enter first name:'
                 },
                 {
                     type: 'input',
-                    name: 'lastName',
+                    name: 'last_name',
                     message: 'Please enter last name:'
                 },
                 {
                     type: 'input',
-                    name: 'employeeID',
-                    message: 'Please enter Employee ID:'
+                    name: 'role_id',
+                    message: 'Please enter corresponding Role ID:'
                 },
-            ]).then(employee => {
-                Database.createEmployee(employee).then( ()=> {
-                    console.log(`Added new employee named:${employee.name}`)
-                }).then( ()=> {
+                {
+                    type: 'input',
+                    name: 'manager_id',
+                    message: 'Please enter corresponding Manager ID:'
+                },
+            ]).then(answers => {
+                database.createEmployee(answers).then(() => {
+                    console.log(`Added new employee named:${answers.first_name}`)
+                }).then(() => {
                     startApp()
                 })
+            })
+        }
+        function updateEmployeeRole() {
+            database.viewAllEmployees()
+            .then(([rows]) => {
+                console.log(rows);
+                let allEmployees = rows;
             })
         }
     }
