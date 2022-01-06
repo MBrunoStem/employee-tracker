@@ -36,7 +36,6 @@ function init() {
                 case 'View All Roles':
                     database.viewAllRoles()
                     .then(([response]) => {
-                        console.log(response)
                         console.log('\n')
                         for (let i = 0; i < response.length; i++) {
                             console.log(`${response[i].role_title} | ${response[i].id} | ${response[i].salary} | ${response[i].department} |`)
@@ -49,7 +48,7 @@ function init() {
                     .then(([response]) => {
                         console.log('\n')
                         for (let i = 0; i < response.length; i++) {
-                        console.log(`${response[i].id } | ${response[i].last_name}, ${response[i].first_name} | ${response[i].roles_id} | ${response[i].role_title } | ${response[i].salary} | ${response[i].department} |` )
+                        console.log(`${response[i].id } | ${response[i].last_name}, ${response[i].first_name} | ${response[i].roles_id} | ${response[i].role_title } | ${response[i].salary} | ${response[i].department}` )
                         }
                         startApp()
                     })
@@ -141,7 +140,7 @@ function init() {
                 },
                 {
                     type: 'input',
-                    name: 'role_id',
+                    name: 'roles_id',
                     message: 'Please enter corresponding Role ID:'
                 },
                 {
