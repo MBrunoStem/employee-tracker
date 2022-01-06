@@ -28,7 +28,7 @@ function init() {
                     .then(([response]) => {
                         console.log('\n')
                         for (let i = 0; i < response.length; i++) {
-                            console.table(response[i].dept_name)
+                            console.table(`${response[i].id} | ${response[i].dept_name}`)
                         }
                         startApp();
                     })
@@ -49,7 +49,7 @@ function init() {
                     .then(([response]) => {
                         console.log('\n')
                         for (let i = 0; i < response.length; i++) {
-                        console.log(`${response[i].last_name}, ${response[i].first_name} | ${response[i].role_title } | ${response[i].salary} | ${response[i].manager} ` )
+                        console.log(`${response[i].id } | ${response[i].last_name}, ${response[i].first_name} | ${response[i].roles_id} | ${response[i].role_title } | ${response[i].salary} | ${response[i].department} |` )
                         }
                         startApp()
                     })
